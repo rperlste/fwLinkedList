@@ -297,6 +297,33 @@ template <typename T>
 void list<T>::operator += (const list<T>& l){
     //todo
 }
+/* ********* HERE IS MY += OPERATOR*****************************
+template <typename T>
+void list<T>::operator += (const list<T>& rhsList)
+{
+    //Check if rhsList is empty
+    if (rhsList.head == NULL)        
+    {
+        std::cout << "Nothing to add, right hand list is empty\n";
+        return;
+    }
+    
+    typename list<T>::node* currNode = rhsList.head;
+    while(true)
+    {
+        if (currNode->link)
+        {
+            this->pushFront(currNode->data);
+            currNode = currNode->link;
+        }
+        else
+        {
+            this->pushFront(currNode->data);
+            break;
+        }
+    }
+}*/
+
 
 template <typename T>
 std::ostream& operator << ( std::ostream& out, const list<T>& l ){
