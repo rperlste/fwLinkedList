@@ -16,20 +16,20 @@ public:
 	FLLNodeIterator( const  FLLNodeIterator& );
 	~FLLNodeIterator() {}
 
-	bool					operator == ( const FLLNodeIterator<T>& it ) const;
-	bool					operator != ( const FLLNodeIterator<T>& it ) const;
+	bool                    operator == ( const FLLNodeIterator<T>& it ) const;
+	bool                    operator != ( const FLLNodeIterator<T>& it ) const;
 
-	T&						operator * ()  const;
-	T&						operator -> () const;
+	T&                      operator * ()  const;
+	T&                      operator -> () const;
 
-	void					operator ++ ();
-	void					operator ++ ( int );
+	void                    operator ++ ();
+	void                    operator ++ ( int );
 
 	friend class list<T>;
 
 private:
-	node*					_node;
-	bool					_end;
+	node*                   _node;
+	bool                    _end;
 };
 
 
