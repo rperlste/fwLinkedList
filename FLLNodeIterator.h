@@ -1,83 +1,98 @@
+/*
+ *    Robbie Perlstein
+ *    101130094
+ *    Advanced Programming
+ *    Spring 2013
+ *    Node Iterator
+ *    
+ *    Forward iterator for fw_list. Complies with C++ STL
+ */
+
 #ifndef _FLLNodeIterator_H
 #define _FLLNodeIterator_H
 
-#include "FwLinkedList.h"
-
-template <typename T> class FLLNodeIterator;
+#include <iterator>
 
 template <typename T>
-class FLLNodeIterator
-{
+class fw_node_iterator : public std::iterator 
+    <std::forward_iterator_tag, T, std::ptrdiff_t, T*, T&> {
+
 public:
+    typedef typename		fw_list<T>::node node;
 
-    typedef typename		list<T>::node node;
+    fw_node_iterator();
+    fw_node_iterator(       node* nPtr );
+    fw_node_iterator(       const fw_node_iterator& );
+    ~fw_node_iterator() {}
 
-    FLLNodeIterator( node*  nPtr );
-    FLLNodeIterator( const  FLLNodeIterator& );
-    ~FLLNodeIterator() {}
-
-    bool                    operator == ( const FLLNodeIterator<T>& it ) const;
-    bool                    operator != ( const FLLNodeIterator<T>& it ) const;
+    bool                    operator == ( const fw_node_iterator<T>& it ) const;
+    bool                    operator != ( const fw_node_iterator<T>& it ) const;
 
     T&                      operator * ()  const;
-    T&                      operator -> () const;
+    node*                   operator -> () const;
 
     void                    operator ++ ();
     void                    operator ++ ( int );
+    void                    operator =  ( const fw_node_iterator<T>& it );
 
-    friend class list<T>;
+    friend class fw_list<T>;
 
 private:
-    node*                   _node;
-    bool                    _end;
+    node*                   cursor;
 };
 
-
 template <typename T>
-FLLNodeIterator<T>::FLLNodeIterator( node* nPtr ){
-    _node = nPtr;
-    ( nPtr == 0 || nPtr->link == 0 ) 
-        ? _end = true
-        : _end = false;
+fw_node_iterator<T>::fw_node_iterator(){
+    cursor = 0;
 }
 
 template <typename T>
-bool FLLNodeIterator<T>::operator == ( const FLLNodeIterator<T>& it ) const {
-    return ( this->_node->data == it._node->data )
-        && ( this->_node->link == it._node->link )
-        && ( this->_end == it._end );
+fw_node_iterator<T>::fw_node_iterator( node* nPtr ){
+    cursor = nPtr;
 }
 
 template <typename T>
-bool FLLNodeIterator<T>::operator != ( const FLLNodeIterator<T>& it ) const {
-    return ( this->_node->data != it._node->data )
-        || ( this->_node->link != it._node->link )
-        || ( this->_end != it._end );
+fw_node_iterator<T>::fw_node_iterator( const fw_node_iterator<T>& it ){
+    this->cursor = it.cursor;
 }
 
 template <typename T>
-T& FLLNodeIterator<T>::operator * () const {
-    return _node->data;
+void fw_node_iterator<T>::operator = ( const fw_node_iterator<T>& it ){
+    this->cursor = it.cursor;
 }
 
 template <typename T>
-T& FLLNodeIterator<T>::operator -> () const {
-    return _node->data;
+bool fw_node_iterator<T>::operator == ( const fw_node_iterator<T>& it ) const {
+    return ( this->cursor == it.cursor );
 }
 
 template <typename T>
-void FLLNodeIterator<T>::operator ++ () {
-    if ( _node->link != 0 ){
-        _node = _node->link;
-    } 
-    if( _node->link == 0 ){
-        _end = true;
+bool fw_node_iterator<T>::operator != ( const fw_node_iterator<T>& it ) const {
+    return ( this->cursor != it.cursor );
+}
+
+template <typename T>
+T& fw_node_iterator<T>::operator * () const {
+    return cursor->data;
+}
+
+template <typename T>
+typename fw_node_iterator<T>::node* fw_node_iterator<T>::operator -> () const {
+    return cursor;
+}
+
+template <typename T>
+void fw_node_iterator<T>::operator ++ () {
+    if ( cursor != 0 ){
+        cursor = cursor->link;
     }
 }
 
 template <typename T>
-void FLLNodeIterator<T>::operator ++ ( int ) {
-    ++ *this;
+void fw_node_iterator<T>::operator ++ ( int ) {
+    if ( cursor != 0 ){
+        cursor = cursor->link;
+    }
 }
 
 #endif

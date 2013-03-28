@@ -1,8 +1,13 @@
-// Author: Will Trobaugh
-// Course:  CSCI 3320, Spring 2013
-// File: list.h
-// Class definition of an adt that represents a single-ended, singly-linked list with iterator support
-// for compatibility with the C++ standard template library
+/*
+ *    Robbie Perlstein
+ *    101130094
+ *    Advanced Programming
+ *    Spring 2013
+ *    Forward Linked List
+ *    
+ *    Class declaration for a single-ended, singly-linked list with iterator
+ *    support. Compatible with C++ STL
+ */
 
 #ifndef _FwLinkedList_H
 #define _FwLinkedList_H
@@ -11,57 +16,58 @@
 #include <exception>
 
 // Forward declarations for overloading operator <<
-template <typename T> class list;
+template <typename T> class fw_list;
 template <typename T> std::ostream& 
-                    operator << (std::ostream&, const list<T>&);
+                    operator << ( std::ostream&, const fw_list<T>& );
 
 #include "FLLNodeIterator.h"
 
 
 // Class definition
 template <typename T>
-class list {
+class fw_list {
 public:
-    typedef FLLNodeIterator<T> iterator;
+    typedef fw_node_iterator<T> iterator;
 
     // Constructors
-    list();
-    list(const list<T>&);
-    list(iterator, iterator);
-    list(T*, T*);
+    fw_list();
+    fw_list(        const fw_list<T>& );
+    fw_list(        iterator, iterator );
+    fw_list(        T*, T* );
 
-    ~list();
+    ~fw_list();
 
     // Constant members
     unsigned        size() const { return used; }
     bool            empty() const { return used==0; }
     const T&        front() const;
-    const iterator  find(const T&) const;
+    const iterator  find( const T& ) const;
 
     // Modification members
-    void            push_front(const T&);
+    void            push_front( const T& );
     void            pop_front();
-    iterator        find(const T&);
-    void            insert(const T&, unsigned);
-    void            insert_after(iterator, const T&);
-    bool            erase_one(const T&);
-    unsigned        erase(const T&);
+    iterator        find( const T& );
+    void            insert( const T&, unsigned );
+    void            insert_after( iterator, const T& );
+    bool            erase_one( const T& );
+    unsigned        erase( const T& );
     void            clear();
 
     // Operators
-    list<T>&        operator = (const list<T>&);
-    void            operator += (const list<T>&);
+    fw_list<T>&     operator =  ( const fw_list<T>& );
+    void            operator += ( const fw_list<T>& );
 
     // Friends
-    friend std::ostream& operator << (std::ostream&, const list<T>&);
-    friend class    FLLNodeIterator<T>;
+    template<T> friend std::ostream& 
+                    operator << ( std::ostream&, const fw_list<T>& );
+    friend class    fw_node_iterator<T>;
 
     // Forward iterator support
     iterator        begin() const;
     iterator        end() const;
 
 private:
-    // Nest our linked-list node
+    // Nest our linked-fw_list node
     struct node
     {
         node(const T& val=T(), node* n=0):data(val),link(n) { }
@@ -74,13 +80,13 @@ private:
 };
 
 template <typename T>
-list<T>::list(){
+fw_list<T>::fw_list(){
     used = 0;
     head = 0;
 }
 
 template <typename T>
-list<T>::~list() {
+fw_list<T>::~fw_list() {
     node* temp = head;
     while( used > 0 ) {
         head = head->link;
@@ -92,28 +98,37 @@ list<T>::~list() {
 
 
 template <typename T>
-list<T>::list( const list<T>& l ){
-    node* insNode = l.head;
-    while( insNode != 0 ){
-        push_front(insNode->data);
-    }
-}
-
-template <typename T>
-list<T>::list( iterator begin, iterator end ){
+fw_list<T>::fw_list( const fw_list<T>& rList ){
     used = 0;
     head = 0;
-    iterator it = begin;
-    while( it != end ){
-        this->push_front( *it );
-        ++ it;
-        ++ used;
-    }
-    this->push_front(*it);
+    *this = rList;
 }
 
 template <typename T>
-list<T>::list( T* begin, T* end ){
+fw_list<T>::fw_list( iterator insIt, iterator last ){
+    used = 0;
+    head = 0;
+    if( insIt != end() ){
+        head = new node( insIt->data );
+        node* currNode = head;
+        ++ insIt;
+        ++ used;
+        while(    insIt != last
+               && insIt != end() ){
+            currNode->link = new node( insIt->data );
+            currNode = currNode->link;
+            ++ insIt;
+            ++ used;
+        }
+        if( insIt != end() ){
+            currNode->link = new node( insIt->data, currNode->link );
+            ++ used;
+        }
+    }
+}
+
+template <typename T>
+fw_list<T>::fw_list( T* begin, T* end ){
     used = 0;
     head = 0;
     push_front( *end );
@@ -121,15 +136,15 @@ list<T>::list( T* begin, T* end ){
 }
 
 template <typename T>
-const T& list<T>::front() const {
+const T& fw_list<T>::front() const {
     if( used == 0 )
         throw std::exception(
-            std::string("No elements exist in the list.").c_str());
+            std::string("No elements exist in the fw_list.").c_str());
     return head->data;
 }
 
 template <typename T>
-const typename list<T>::iterator list<T>::find( const T& data ) const {
+const typename fw_list<T>::iterator fw_list<T>::find( const T& data ) const {
     iterator it(0);
     for( it = begin();
             it != end();
@@ -142,16 +157,16 @@ const typename list<T>::iterator list<T>::find( const T& data ) const {
 
 
 template <typename T>
-void list<T>::push_front( const T& data) {
-    typename list<T>::node* temp = new node(data, head);
+void fw_list<T>::push_front( const T& data) {
+    node* temp = new node(data, head);
     head = temp;
     ++ used;
 }
 
 template <typename T>
-void list<T>::pop_front(){
+void fw_list<T>::pop_front(){
     if ( used == 0 ) return;
-    typename list<T>::node* toDel = head;
+    typename fw_list<T>::node* toDel = head;
     head = head->link;
     delete toDel;
     -- used;
@@ -159,7 +174,7 @@ void list<T>::pop_front(){
 
 
 template <typename T>
-typename list<T>::iterator list<T>::find( const T& data ){
+typename fw_list<T>::iterator fw_list<T>::find( const T& data ){
     unsigned i = 0;
     node* n = head;
     while( i < used ){
@@ -173,41 +188,42 @@ typename list<T>::iterator list<T>::find( const T& data ){
 
 
 template <typename T>
-void list<T>::insert(const T& data, unsigned insPos) {
-    unsigned currPos = 0;
-    node* currNode = head;
-
+void fw_list<T>::insert( const T& data, unsigned insPos ){
+    
     // Special case: Insert at head
-    if( insPos == 0 ){
-        push_front( data );
-        
-    // Special case: Insert at end
-    } else if ( insPos >= used ){
-        while( currNode->link != 0 ){
-            currNode = currNode->link;
-        }
-        currNode->link = new node(data);
+    if( insPos == 0 || used == 0 ){
+        head = new node( data, head );
+    }
 
-    // Normal case: Insert at pos
-    } else {
-        ++ currPos;
-        while( currPos < insPos ){
-            currNode->link;
+    // Insert in middle or end
+    else {
+        unsigned currPos = 1;
+        node* currNode = head;
+        while(     currNode->link != 0
+                && currPos < insPos ){
+            currNode = currNode->link;
             ++ currPos;
         }
         currNode->link = new node( data, currNode->link );
     }
+    ++ used;
     return;
 
 }
 
 template <typename T>
-void list<T>::insert_after( iterator it, const T& data ){
-    it._node->link = new node( data, it._node->link );
+void fw_list<T>::insert_after( iterator it, const T& data ){
+    // End insert
+    if( it->link == 0 ) {
+         it->link = new node( data );
+    } else {
+        it->link = new node( data, it->link );
+    }
+    ++ used;
 }
 
 template <typename T>
-bool list<T>::erase_one( const T& toErase ){
+bool fw_list<T>::erase_one( const T& toErase ){
     unsigned pos = 0;
     node* curr = head;
     node* toDel = head;
@@ -237,7 +253,7 @@ bool list<T>::erase_one( const T& toErase ){
 }
 
 template <typename T>
-unsigned list<T>::erase( const T& toErase ){
+unsigned fw_list<T>::erase( const T& toErase ){
     unsigned pos = 0;
     unsigned count = 0;
     node* curr = head;
@@ -272,58 +288,86 @@ unsigned list<T>::erase( const T& toErase ){
 }
 
 template <typename T>
-void list<T>::clear() {
+void fw_list<T>::clear() {
     while( used > 0 ){
         pop_front();
     }
 }
 
 template <typename T>
-typename list<T>& list<T>::operator = (const list<T>& l){
+typename fw_list<T>& fw_list<T>::operator = ( const fw_list<T>& rList ){
     this->clear();
-    iterator it(0);
-    for( it = l.begin() ;
-            it != l.end();
-            ++ it ){
-                this->push_front(*it);
+    // avoid unnecessary traversal
+    if( rList.size() > 0 ){
+        node* insNode = rList.head;
+        head = new node( insNode->data );
+        node* currNode = head;
+        insNode = insNode->link;
+        while( insNode != 0 ){
+            currNode->link = new node( insNode->data );
+            currNode = currNode->link;
+            insNode = insNode->link;
+        }
     }
-    push_front(*it);
-    used = l.size();
+    used = rList.size();
     return *this;
 }
 
-
+// Warning... not cheap to use!
 template <typename T>
-void list<T>::operator += (const list<T>& l){
-    //todo
+void fw_list<T>::operator += ( const fw_list<T>& rList ){
+    // avoid unnecessary traversal
+    if( rList.size() > 0 ){
+        if( head != 0 ){
+            node* currNode = head;
+            node* insNode = rList.head;
+            while( currNode->link != 0 ){
+                currNode = currNode->link;
+            }
+            while( insNode != 0 ){
+                currNode->link = new node(insNode->data);
+                currNode = currNode->link;
+                insNode = insNode->link;
+                ++ used;
+            }
+        }
+    }
 }
 
 template <typename T>
-std::ostream& operator << ( std::ostream& out, const list<T>& l ){
-    //todo
+std::ostream& operator << ( std::ostream& out, const fw_list<T>& rList ){
+    out << "{";
+    if( rList.size() > 0 ){
+        unsigned pos = 0;
+        fw_list<int>::iterator it = rList.begin();
+
+        // Write head without comma
+        if( it != rList.end() ){
+            out << " " << it->data;
+            ++ it;
+        }
+        while( it != rList.end() ){
+            out << ", " << it->data;
+            ++ it;
+        }
+    }
+    out << " }";
     return out;
 }
 
 template <typename T>
-typename list<T>::iterator list<T>::begin() const {
+typename fw_list<T>::iterator fw_list<T>::begin() const {
     return iterator( head );
 }
 
 template <typename T>
-typename list<T>::iterator list<T>::end() const {
-    node* temp = head;
-
-    if( temp == 0 )
-        return iterator( temp );
-
-    while( temp->link != 0 )
-        temp = temp->link;
-    return iterator( temp );
+typename fw_list<T>::iterator fw_list<T>::end() const {
+    return iterator();
 }
 
 template <typename T>
-typename list<T>::node* list<T>::copy( node* toCopy ) {
-    return new node( (*toCopy) );
+typename fw_list<T>::node* fw_list<T>::copy( node* toCopy ) {
+    return new node( toCopy->data, toCopy->link );
 }
 
 #endif
