@@ -254,35 +254,36 @@ bool fw_list<T>::erase_one( const T& toErase ){
 
 template <typename T>
 unsigned fw_list<T>::erase( const T& toErase ){
-    unsigned pos = 0;
     unsigned count = 0;
     node* curr = head;
     node* toDel = head;
 
-    // Delete head, special case
-    if( curr != 0 && curr->data == toErase ){
-        if( curr->link != 0 ){
-            curr = curr->link;
-        }
+    // Special case: head deletion
+    while(     curr != 0
+            && curr->data == toErase ){
+        toDel = curr;
+        curr = curr->link;
         delete toDel;
-        -- used;
         ++ count;
+        -- used;
     }
 
-    ++ pos;
-    toDel = curr->link;
-    while( pos < used ){
-        if( toDel->data == toErase ){
-            curr->link = toDel->link;
-            delete toDel;
-            toDel = curr->link;
-            -- used;
-            ++ count;
+    while( curr != 0 ){
+        toDel = curr->link;
+        if( toDel != 0 ){
+            if( toDel->data == toErase ){
+                curr->link = toDel->link;
+                delete toDel;
+                toDel = curr->link;
+                ++ count;
+                -- used;
+            } else {
+                curr  = curr->link;
+                toDel = curr->link;
+            }
         } else {
-            curr = toDel;
-            toDel = toDel->link;
+            break;
         }
-        ++ pos;
     }
     return count;
 }
