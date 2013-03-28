@@ -283,6 +283,7 @@ namespace list_test
             l.push_front(1);
             std::stringstream ss;
             ss << l;
+            Assert::AreEqual( std::string("{ 1, 2, 3 }"), ss.str() );
         }
 
         TEST_METHOD(ListCopyNode){
