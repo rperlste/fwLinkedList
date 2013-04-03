@@ -1,11 +1,8 @@
 /*
  *    Robbie Perlstein
- *    101130094
- *    Advanced Programming
- *    Spring 2013
  *    Node Iterator
  *    
- *    Forward iterator for fw_list. Complies with C++ STL
+ *    Forward iterator for fw_list. Complies with C++ STL.
  */
 
 #ifndef _FLLNodeIterator_H
@@ -21,16 +18,19 @@ public:
     typedef typename		fw_list<T>::node node;
 
     fw_node_iterator();
-    fw_node_iterator(       node* nPtr );
-    fw_node_iterator(       const fw_node_iterator& );
+    fw_node_iterator( node* nPtr );
+    fw_node_iterator( const fw_node_iterator& );
     ~fw_node_iterator() {}
 
+    // Equality operations
     bool                    operator == ( const fw_node_iterator<T>& it ) const;
     bool                    operator != ( const fw_node_iterator<T>& it ) const;
 
+    // Dereference operations
     T&                      operator * ()  const;
     node*                   operator -> () const;
 
+    // Assign/Change iterator's cursor
     void                    operator ++ ();
     void                    operator ++ ( int );
     void                    operator =  ( const fw_node_iterator<T>& it );
